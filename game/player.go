@@ -1,8 +1,13 @@
 package game
 
 import (
+    "bufio"
 	"math/rand"
 	"time"
+    "fmt"
+    "os"
+    "strconv"
+    "strings"
 )
 
 type Player interface {
@@ -27,3 +32,25 @@ func (player *RandomPlayer) MakeMove(board *Board) int {
 
 	return move
 }
+
+type HumanPlayer struct {
+}
+
+func (player *HumanPlayer) MakeMove(board *Board) int {
+    reader := bufio.NewReader(os.Stdin)
+
+    // Show the board and ask for input
+    board.Print()
+    fmt.Print("Enter column (1-7): ")
+    text, _ := reader.ReadString('\n')
+    move, _ := strconv.Atoi(strings.TrimSpace(text))
+    fmt.Println(move)
+
+    // User move will be 1-indexed. We want 0 indexed
+    board.MakeMove(move - 1)
+
+    return move
+}
+
+
+
