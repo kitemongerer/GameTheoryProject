@@ -68,10 +68,11 @@ func (board *Board) checkForWin() bool {
 		rowSlice := make([]byte, numCols)
 
 		for j, col := range board.board {
+			fmt.Println(col[i])
 			rowSlice[j] = col[i]
 		}
 		
-		if board.checkSectionWin(string(rowSlice[:numRows])) {
+		if board.checkSectionWin(string(rowSlice[:numCols])) {
 			return true
 		}
 	}

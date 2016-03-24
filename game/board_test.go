@@ -108,13 +108,13 @@ func TestCheckForWin(t *testing.T) {
 	}
 
 	// Set up win across
-	for i := 0; i < 4; i++ {
+	for i := 6; i >= 3; i-- {
 		board.MakeMove(i)
 		if (i != 3) {
 			board.MakeMove(i)
 		}
 	}
-	
+
 	if !board.checkForWin() {
 		t.Error("Horizontal win: X should be the winner")
 	}
