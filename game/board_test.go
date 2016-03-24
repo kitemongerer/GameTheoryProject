@@ -114,7 +114,7 @@ func TestCheckForWin(t *testing.T) {
 			board.MakeMove(i)
 		}
 	}
-	board.Print()
+	
 	if !board.checkForWin() {
 		t.Error("Horizontal win: X should be the winner")
 	}
@@ -128,7 +128,7 @@ func TestCheckForWin(t *testing.T) {
 			board.MakeMove(1)
 		}
 	}
-	board.Print()
+	
 	if !board.checkForWin() {
 		t.Error("Vertical win: X should be the winner")
 	}
@@ -144,9 +144,61 @@ func TestCheckForWin(t *testing.T) {
 			board.MakeMove((i + 1) % 4)
 		}
 	}
-	board.Print()
+	
 	if !board.checkForWin() {
 		t.Error("Diagonal win: X should be the winner")
+	}
+}
+
+func TestCheckEndGameWin(t *testing.T) {
+	board := Initialize()
+
+	// Set up win across
+	for i := 0; i < 4; i++ {
+		board.MakeMove(i)
+		if (i != 3) {
+			board.MakeMove(i)
+		}
+	}
+
+	if !board.CheckEndGame() {
+		t.Error("One player has won. Should be end of game!")
+	}
+}
+
+func TestCheckEndGameFull(t *testing.T) {
+	board := Initialize()
+
+	// Fill board
+	for i := 0; i < numCols * numRows; i++ {
+		if i % 2 == 0 {
+			board.MakeMove(i % 7)	
+		} else {
+			board.MakeMove(i % 7)
+			board.MakeMove(i % 7)
+		}
+	}
+
+	// To make there be no winner
+	board.board[4][3] = 'X'
+	board.board[2][3] = 'Y'
+	board.board[5][2] = 'Y'
+
+	if !board.CheckEndGame() {
+		t.Error("Board is full. Should be end of game!")
+	}
+
+	if board.Winner != ' ' {
+		t.Error("No winner. Winner marker should be empty.")
+	}
+
+}
+
+func TestCheckEndGameNotFullNotWin(t *testing.T) {
+	board := Initialize()
+
+	if board.CheckEndGame() {
+		t.Error("No moves have been made. Game shouldn't be over")
 	}
 }
 

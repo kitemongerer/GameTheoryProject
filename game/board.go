@@ -15,7 +15,6 @@ type Board struct {
 	WhoseTurn int
 	ValidMoves [numCols]bool
 	Winner byte
-	GameOver bool
 }
 
 func Initialize() *Board {
@@ -120,8 +119,20 @@ func (board *Board) checkSectionWin(s string) bool {
 	return didWin
 }
 
-func (board *Board) checkEndGame() {
+func (board *Board) CheckEndGame() bool {
+	isBoardFull := true
+	for _, col := range board.board {
+		for _, val := range col {
+			if val == ' ' {
+				isBoardFull = false
+			}
+		}
+	}
 
+	// Have to perform CheckForWin in case win occurs on full board
+	return board.checkForWin() || isBoardFull
+	return false
+	
 }
 
 func (board *Board) Print() {
