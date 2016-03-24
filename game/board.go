@@ -8,6 +8,7 @@ import (
 var Tokens = [2]byte{'X', 'O'}
 const numCols = 7
 const numRows = 6
+const numDiags = 12
 
 type Board struct {
 	board [numCols][numRows]byte
@@ -57,21 +58,51 @@ func (board *Board) IsValidMove(col int) bool {
 
 func (board *Board) checkForWin() bool {
 	// Check each column
-	for i, val := range board.board {
-		
-		if board.checkSectionWin(string(val[:numRows])) {
-			return true
-		}
-
-		slice := make([]byte, numRows)
-		for i, char := range board.board[i] {
-			slice[i] = char
-		}
-		fmt.Println(string(slice[:numRows]))
-		if board.checkSectionWin(string(slice[:numRows])) {
+	for _, col := range board.board {
+		if board.checkSectionWin(string(col[:numRows])) {
 			return true
 		}
 	}
+
+	// Check each row
+	for i := 0; i < numRows; i++ {
+		rowSlice := make([]byte, numCols)
+
+		for j, col := range board.board {
+			rowSlice[j] = col[i]
+		}
+		
+		if board.checkSectionWin(string(rowSlice[:numRows])) {
+			return true
+		}
+	}
+
+	// Check each diagonal
+	for i := 0; i < numDiags; i++ {
+		var leftDiagSlice, rightDiagslice []byte
+		// No diagonal longer than 6
+		if (i > 5) {
+			leftDiagSlice = make([]byte, 6 - (i + 1) % 7)
+			rightDiagslice = make([]byte, 6 - (i + 1) % 7)
+		} else {
+			leftDiagSlice = make([]byte, i + 1)
+			rightDiagslice = make([]byte, i + 1)
+		}
+		
+		for j := 0; j < len(leftDiagSlice); j++ {
+			leftDiagSlice[j] = board.board[Min(i, 6) - j][Max(0, i - 6) + j]
+			// Same as left but flipped over horizontal axis
+			rightDiagslice[j] = board.board[Min(i, 6) - j][5 - (Max(0, i - 6) + j)]
+		}
+
+		if board.checkSectionWin(string(leftDiagSlice[:len(leftDiagSlice)])) {
+			return true
+		}
+		if board.checkSectionWin(string(rightDiagslice[:len(rightDiagslice)])) {
+			return true
+		}
+	}
+	
 
 	return false
 }
@@ -107,4 +138,18 @@ func (board *Board) Print() {
 		fmt.Println("+---+---+---+---+---+---+---+")
 	}
 
+}
+
+func Min(x, y int) int {
+    if x < y {
+        return x
+    }
+    return y
+}
+
+func Max(x, y int) int {
+    if x > y {
+        return x
+    }
+    return y
 }
