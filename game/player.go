@@ -1,5 +1,6 @@
 package game
 
+import "github.com/twmb/algoimpl/go/graph"
 import (
     "bufio"
 	"math/rand"
@@ -52,5 +53,30 @@ func (player *HumanPlayer) MakeMove(board *Board) int {
     return move
 }
 
+type SmartPlayer struct {
+    piece byte
+}
 
+func NewSmartPlayer(playerIdx int) *SmartPlayer {
+    // Set it to player 0's turn
+    return &SmartPlayer{piece: Tokens[playerIdx]}
+}
+
+func (player *SmartPlayer) MakeMove(board *Board) int {
+    move := 1
+
+    return move
+}
+
+
+
+func buildMoveTree(board *Board, token byte) (*graph.Graph, *graph.Node) {
+    g := graph.New(graph.Directed)
+    startNode := g.MakeNode()
+
+    var val interface{} = calcPlayerValue(board, token)
+    startNode.Value = &val
+
+    return g, &startNode
+}
 

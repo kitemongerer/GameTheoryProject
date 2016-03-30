@@ -7,7 +7,7 @@ func TestRandomMakeMove(t *testing.T) {
 	var moves [7]int
 
 	for i := 0; i < 700; i++ {
-		board := Initialize()
+		board := NewBoard()
 		move := player.MakeMove(board)
 
 		if (move > 6 || move < 0) {
@@ -32,7 +32,7 @@ func TestRandomMakeMove(t *testing.T) {
 
 func TestRandomMakeInvalidMove(t *testing.T) {
 	var player RandomPlayer
-	board := Initialize()
+	board := NewBoard()
 
 	// Fill board except last column
 	for i := 0; i < 6; i++ {
@@ -49,3 +49,30 @@ func TestRandomMakeInvalidMove(t *testing.T) {
 		}
 	}
 }
+
+func TestSmartPlayerInitialize(t *testing.T) {
+	player := NewSmartPlayer(1)
+
+	if player.piece != 'O' {
+		t.Error("Player 2 should have piece O.")
+	}
+
+	player = NewSmartPlayer(0)
+	
+	if player.piece != 'X' {
+		t.Error("Player 1 should have piece X.")
+	}	
+}
+
+
+
+/*func TestBuildMoveTreeEmptyBoard(t *testing.T) {
+	board := NewBoard()
+	_, start := buildMoveTree(board, 'X')
+
+	if (*start.Value).(int) != 0 {
+		t.Error("Starting Node's value should be 0 on an empty board")
+	}
+}*/
+
+

@@ -3,7 +3,7 @@ package game
 import "testing"
 
 func TestInitialize(t *testing.T) {
-	board := Initialize()
+	board := NewBoard()
 
 	if board.WhoseTurn != 0 {
 		t.Error("Board should initialize to player 0's turn.")
@@ -20,7 +20,7 @@ func TestInitialize(t *testing.T) {
 }
 
 func TestMakeMove(t *testing.T) {
-	board := Initialize()
+	board := NewBoard()
 
 	board.MakeMove(1)
 
@@ -50,7 +50,7 @@ func TestMakeMove(t *testing.T) {
 }
 
 func TestMakeMoveAndValidMove(t *testing.T) {
-	board := Initialize()
+	board := NewBoard()
 
 	for i:=0; i < 6; i++ {
 		board.MakeMove(1)
@@ -66,10 +66,10 @@ func TestMakeMoveAndValidMove(t *testing.T) {
 }
 
 func TestSectionWin(t *testing.T) {
-	board := Initialize()
+	board := NewBoard()
 
 	// Check for X win
-	if !board.checkSectionWin("XXXX   ") {
+	if board.checkSectionWin("XXXX   ") != 1 {
 		t.Error("Should win with four X's in a row")	
 	}
 
@@ -77,10 +77,10 @@ func TestSectionWin(t *testing.T) {
 		t.Error("Must set winner after win detected")
 	}
 
-	board = Initialize()
+	board = NewBoard()
 
 	// Check for O win
-	if !board.checkSectionWin("  OOOO ") {
+	if board.checkSectionWin("  OOOO ") != 1 {
 		t.Error("Should win with four O's in a row")	
 	}
 
@@ -88,10 +88,10 @@ func TestSectionWin(t *testing.T) {
 		t.Error("Must set winner after win detected")
 	}
 
-	board = Initialize()
+	board = NewBoard()
 
 	// Check for not win
-	if board.checkSectionWin("OXXX  X") {
+	if board.checkSectionWin("OXXX  X") == 1 {
 		t.Error("Should not win with only three in a row")	
 	}
 
@@ -101,7 +101,7 @@ func TestSectionWin(t *testing.T) {
 }
 
 func TestCheckForWin(t *testing.T) {
-	board := Initialize()
+	board := NewBoard()
 
 	if board.checkForWin() {
 		t.Error("No one has moved there shouldn't be a winner")
@@ -119,7 +119,7 @@ func TestCheckForWin(t *testing.T) {
 		t.Error("Horizontal win: X should be the winner")
 	}
 
-	board = Initialize()
+	board = NewBoard()
 
 	// Set up win vertical
 	for i := 0; i < 4; i++ {
@@ -133,7 +133,7 @@ func TestCheckForWin(t *testing.T) {
 		t.Error("Vertical win: X should be the winner")
 	}
 
-	board = Initialize()
+	board = NewBoard()
 
 	// Set up win diagonally
 	board.MakeMove(2)
@@ -151,7 +151,7 @@ func TestCheckForWin(t *testing.T) {
 }
 
 func TestCheckEndGameWin(t *testing.T) {
-	board := Initialize()
+	board := NewBoard()
 
 	// Set up win across
 	for i := 0; i < 4; i++ {
@@ -167,7 +167,7 @@ func TestCheckEndGameWin(t *testing.T) {
 }
 
 func TestCheckEndGameFull(t *testing.T) {
-	board := Initialize()
+	board := NewBoard()
 
 	// Fill board
 	for i := 0; i < numCols * numRows; i++ {
@@ -195,10 +195,19 @@ func TestCheckEndGameFull(t *testing.T) {
 }
 
 func TestCheckEndGameNotFullNotWin(t *testing.T) {
-	board := Initialize()
+	board := NewBoard()
 
 	if board.CheckEndGame() {
 		t.Error("No moves have been made. Game shouldn't be over")
+	}
+}
+
+func TestCalcPlayerValueEmptyBoard(t *testing.T) {
+	board := NewBoard()
+	val := calcPlayerValue(board, 'X')
+
+	if val != 0 {
+		t.Error("Starting Node's value should be 0 on an empty board")
 	}
 }
 

@@ -17,7 +17,7 @@ type Board struct {
 	Winner byte
 }
 
-func Initialize() *Board {
+func NewBoard() *Board {
 	var b [numCols][numRows]byte
 
 	// Initialize all tiles to empty
@@ -55,12 +55,12 @@ func (board *Board) IsValidMove(col int) bool {
 	return board.ValidMoves[col]
 }
 
-func (board *Board) checkForWin() bool {
+func (board *Board) checkBoardValue() int {
+	boardValue := 0
+
 	// Check each column
 	for _, col := range board.board {
-		if board.checkSectionWin(string(col[:numRows])) {
-			return true
-		}
+		boardValue += board.checkSectionWin(string(col[:numRows]))
 	}
 
 	// Check each row
@@ -71,9 +71,7 @@ func (board *Board) checkForWin() bool {
 			rowSlice[j] = col[i]
 		}
 
-		if board.checkSectionWin(string(rowSlice[:numCols])) {
-			return true
-		}
+		boardValue += board.checkSectionWin(string(rowSlice[:numCols]))
 	}
 
 	// Check each diagonal
@@ -94,26 +92,33 @@ func (board *Board) checkForWin() bool {
 			rightDiagslice[j] = board.board[Min(i, 6) - j][5 - (Max(0, i - 6) + j)]
 		}
 
-		if board.checkSectionWin(string(leftDiagSlice[:len(leftDiagSlice)])) {
-			return true
-		}
-		if board.checkSectionWin(string(rightDiagslice[:len(rightDiagslice)])) {
-			return true
-		}
+		boardValue += board.checkSectionWin(string(leftDiagSlice[:len(leftDiagSlice)]))
+		boardValue += board.checkSectionWin(string(rightDiagslice[:len(rightDiagslice)]))
 	}
 	
-
-	return false
+	return boardValue
 }
 
-func (board *Board) checkSectionWin(s string) bool {
-	didWin := false
+func calcPlayerValue(board *Board, token byte) int {
+    return 0
+}
+
+func (board *Board) checkSectionValue(s string) int {
+	return 0
+}
+
+func (board *Board) checkForWin() bool {
+	return board.checkBoardValue() != 0
+}
+
+func (board *Board) checkSectionWin(s string) int {
+	didWin := 0
 	if strings.Contains(s, "XXXX") {
 		board.Winner = 'X'
-		didWin = true
+		didWin = 1
 	} else if strings.Contains(s, "OOOO") {
 		board.Winner = 'O'
-		didWin = true
+		didWin = 1
 	}
 
 	return didWin
