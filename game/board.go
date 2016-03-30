@@ -55,12 +55,12 @@ func (board *Board) IsValidMove(col int) bool {
 	return board.ValidMoves[col]
 }
 
-func (board *Board) checkBoardValue() int {
+func (board *Board) checkBoardValue(valueFunction func(string) int) int {
 	boardValue := 0
 
 	// Check each column
 	for _, col := range board.board {
-		boardValue += board.checkSectionWin(string(col[:numRows]))
+		boardValue += valueFunction(string(col[:numRows]))
 	}
 
 	// Check each row
@@ -71,7 +71,7 @@ func (board *Board) checkBoardValue() int {
 			rowSlice[j] = col[i]
 		}
 
-		boardValue += board.checkSectionWin(string(rowSlice[:numCols]))
+		boardValue += valueFunction(string(rowSlice[:numCols]))
 	}
 
 	// Check each diagonal
@@ -92,8 +92,8 @@ func (board *Board) checkBoardValue() int {
 			rightDiagslice[j] = board.board[Min(i, 6) - j][5 - (Max(0, i - 6) + j)]
 		}
 
-		boardValue += board.checkSectionWin(string(leftDiagSlice[:len(leftDiagSlice)]))
-		boardValue += board.checkSectionWin(string(rightDiagslice[:len(rightDiagslice)]))
+		boardValue += valueFunction(string(leftDiagSlice[:len(leftDiagSlice)]))
+		boardValue += valueFunction(string(rightDiagslice[:len(rightDiagslice)]))
 	}
 	
 	return boardValue
@@ -108,7 +108,7 @@ func (board *Board) checkSectionValue(s string) int {
 }
 
 func (board *Board) checkForWin() bool {
-	return board.checkBoardValue() != 0
+	return board.checkBoardValue(board.checkSectionWin) != 0
 }
 
 func (board *Board) checkSectionWin(s string) int {
