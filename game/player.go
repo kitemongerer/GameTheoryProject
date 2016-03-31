@@ -74,7 +74,7 @@ func buildMoveTree(board *Board, token byte) (*graph.Graph, *graph.Node) {
     g := graph.New(graph.Directed)
     startNode := g.MakeNode()
 
-    var val interface{} = calcPlayerValue(board, token)
+    var val interface{} = board.CalcPlayerValue(token)
     startNode.Value = &val
 
     return g, &startNode

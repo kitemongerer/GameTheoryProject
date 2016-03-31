@@ -6,6 +6,21 @@ import (
 )
 
 var Tokens = [2]byte{'X', 'O'}
+
+// Represents player values if the section contains a certain
+// configuration of tokens (T) and empty spaces
+var ConfigValues = map[string]int{
+    "T "	:	1,
+    " T "	:	2,
+    "TT "	:	3,
+    " TT "	:	4,
+    "TTT "	:	5,
+    " TTT "	:	6,
+    
+    // Maximum integer value since it is a win
+    "TTTT"	:	int(^uint(0)  >> 1),
+}
+
 const numCols = 7
 const numRows = 6
 const numDiags = 12
@@ -55,6 +70,8 @@ func (board *Board) IsValidMove(col int) bool {
 	return board.ValidMoves[col]
 }
 
+// Takes in a function used to calculate the value of a configuration of tokens
+// Returns total board valuation
 func (board *Board) checkBoardValue(valueFunction func(string) int) int {
 	boardValue := 0
 
@@ -99,12 +116,31 @@ func (board *Board) checkBoardValue(valueFunction func(string) int) int {
 	return boardValue
 }
 
-func calcPlayerValue(board *Board, token byte) int {
-    return 0
+func (board *Board) CalcPlayerValue(token byte) int {
+    return board.checkBoardValue(board.checkSectionValue)
 }
 
 func (board *Board) checkSectionValue(s string) int {
-	return 0
+	val0, val1 := 0, 0
+	for key, mapVal := range(ConfigValues) {
+		// Check if section contains any player 1 value strings or their reverses
+		if strings.Contains(s, strings.Replace(key, "T", string(Tokens[0]), -1)) ||
+			strings.Contains(s, Reverse(strings.Replace(key, "T", string(Tokens[0]), -1))) {
+			
+			// Make sure maximum value string is the only one represented
+			val0 = Max(val0, mapVal)
+		}
+
+		// Check if section contains any player 2 value strings or their reverses
+		if strings.Contains(s, strings.Replace(key, "T", string(Tokens[1]), -1)) ||
+			strings.Contains(s, Reverse(strings.Replace(key, "T", string(Tokens[1]), -1))) {
+			
+			// Make sure maximum value string is the only one represented
+			val1 = Max(val1, mapVal)
+		}
+	}
+
+	return val0 - val1
 }
 
 func (board *Board) checkForWin() bool {
@@ -168,4 +204,19 @@ func Max(x, y int) int {
         return x
     }
     return y
+}
+
+func Reverse(value string) string {
+    // Convert string to rune slice.
+    // ... This method works on the level of runes, not bytes.
+    data := []rune(value)
+    result := []rune{}
+
+    // Add runes in reverse order.
+    for i := len(data) - 1; i >= 0; i-- {
+	result = append(result, data[i])
+    }
+
+    // Return new string.
+    return string(result)
 }

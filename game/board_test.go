@@ -202,9 +202,134 @@ func TestCheckEndGameNotFullNotWin(t *testing.T) {
 	}
 }
 
+func TestCheckSectionValueJustXTokens(t *testing.T) {
+	board := NewBoard()
+
+
+	s := "       "
+
+	val := board.checkSectionValue(s)
+
+	if val != 0 {
+		t.Error("Empty section should have 0 value.")
+	}
+
+	s = "      X"
+
+	val = board.checkSectionValue(s)
+
+	if val != ConfigValues["T "] {
+		t.Error("Section should have correct value for: \"" + s + "\"")
+	}
+
+	s = "    X  "
+
+	val = board.checkSectionValue(s)
+
+	if val != ConfigValues[" T "] {
+		t.Error("Section should have correct value for: \"" + s + "\"")
+	}
+
+	s = "     XX"
+
+	val = board.checkSectionValue(s)
+
+	if val != ConfigValues["TT "] {
+		t.Error("Section should have correct value for: \"" + s + "\"")
+	}
+
+	s = "    XX " 
+
+	val = board.checkSectionValue(s)
+
+	if val != ConfigValues[" TT "] {
+		t.Error("Section should have correct value for: \"" + s + "\"")
+	}
+
+	s = "    XXX"
+
+	val = board.checkSectionValue(s)
+
+	if val != ConfigValues["TTT "] {
+		t.Error("Section should have correct value for: \"" + s + "\"")
+	}
+
+	s = "   XXX " 
+
+	val = board.checkSectionValue(s)
+
+	if val != ConfigValues[" TTT "] {
+		t.Error("Section should have correct value for: \"" + s + "\"")
+	}
+
+	s = "  XXXX " 
+
+	val = board.checkSectionValue(s)
+
+	if val != ConfigValues["TTTT"] {
+		t.Error("Section should have correct value for: \"" + s + "\"")
+	}
+}
+
+func TestCheckSectionValueJustYTokens(t *testing.T) {
+	board := NewBoard()
+
+	s := "      O"
+
+	val := board.checkSectionValue(s)
+
+	if val != -ConfigValues["T "] {
+		t.Error("Section should have correct value for: \"" + s + "\"")
+	}
+
+	s = "   OOO " 
+
+	val = board.checkSectionValue(s)
+
+	if val != -ConfigValues[" TTT "] {
+		t.Error("Section should have correct value for: \"" + s + "\"")
+	}
+
+	s = "  OOOO " 
+
+	val = board.checkSectionValue(s)
+
+	if val != -ConfigValues["TTTT"] {
+		t.Error("Section should have correct value for: \"" + s + "\"")
+	}
+}
+
+func TestCheckSectionValueBothTokens(t *testing.T) {
+	board := NewBoard()
+
+	s := "      XO"
+
+	val := board.checkSectionValue(s)
+
+	if val != ConfigValues["T "] {
+		t.Error("Section should have correct value for: \"" + s + "\"")
+	}
+
+	s = "   XOX " 
+
+	val = board.checkSectionValue(s)
+
+	if val != 2 * ConfigValues["T "] {
+		t.Error("Section should have correct value for: \"" + s + "\"")
+	}
+
+	s = " XXOOOX " 
+
+	val = board.checkSectionValue(s)
+
+	if val != ConfigValues["T "] + ConfigValues["TT "] {
+		t.Error("Section should have correct value for: \"" + s + "\"")
+	}
+}
+
 func TestCalcPlayerValueEmptyBoard(t *testing.T) {
 	board := NewBoard()
-	val := calcPlayerValue(board, 'X')
+	val := board.CalcPlayerValue('X')
 
 	if val != 0 {
 		t.Error("Starting Node's value should be 0 on an empty board")

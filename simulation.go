@@ -1,5 +1,5 @@
 package main
-
+/*
 import (
 	"FinalProject/game"
 	"os"
@@ -43,4 +43,4 @@ func main() {
 	}
 
 	b.Print()
-}
+}*/
