@@ -124,19 +124,23 @@ func (board *Board) checkSectionValue(s string) int {
 	val0, val1 := 0, 0
 	for key, mapVal := range(ConfigValues) {
 		// Check if section contains any player 1 value strings or their reverses
-		if strings.Contains(s, strings.Replace(key, "T", string(Tokens[0]), -1)) ||
-			strings.Contains(s, Reverse(strings.Replace(key, "T", string(Tokens[0]), -1))) {
+		tokenString := strings.Replace(key, "T", string(Tokens[0]), -1)
+		reverseTokenString := Reverse(tokenString)
+		if strings.Contains(s, tokenString) ||
+			strings.Contains(s, reverseTokenString) {
 			
 			// Make sure maximum value string is the only one represented
-			val0 = Max(val0, mapVal)
+			val0 = Max(val0, mapVal * (strings.Count(s, tokenString), strings.Count(s, reverse)))
 		}
 
 		// Check if section contains any player 2 value strings or their reverses
-		if strings.Contains(s, strings.Replace(key, "T", string(Tokens[1]), -1)) ||
-			strings.Contains(s, Reverse(strings.Replace(key, "T", string(Tokens[1]), -1))) {
+		tokenString = strings.Replace(key, "T", string(Tokens[1]), -1)
+		reverseTokenString = Reverse(tokenString)
+		if strings.Contains(s, tokenString) ||
+			strings.Contains(s, reverseTokenString) {
 			
 			// Make sure maximum value string is the only one represented
-			val1 = Max(val1, mapVal)
+			val1 = Max(val1, mapVal * (strings.Count(s, tokenString), strings.Count(s, reverse)))
 		}
 	}
 
