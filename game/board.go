@@ -125,87 +125,71 @@ func (board *Board) CalcPlayerValue(token byte) int {
 
 func (board *Board) checkSectionValue(s string) int {
 	sectionValue := 0
-	tokenString := ""
-fmt.Println(s)
-	// Check for win
-	if strings.Contains(strings.Replace(s, string(Tokens[0]), "T", -1), "TTTT") {
-		return ConfigValues["TTTT"]
-	}
 
-	// Find idx of first token
-	idx := strings.Index(s, string(Tokens[0]))
+	for tokenIdx, val := range Tokens {
+		tokenString := ""
 
-	// Make sure token is found
-	if idx != -1 {
+		// Convert 0 to 1 and 1 to - 1
+		mul := -1 * (tokenIdx * 2 - 1)
 
-		// Check if empty space before token
-		if idx != 0 && s[idx - 1] == ' ' {
-			tokenString += " "
+		// Check for win
+		if strings.Contains(strings.Replace(s, string(val), "T", -1), "TTTT") {
+			return mul * ConfigValues["TTTT"]
 		}
 
-		// Find all tokens adjacent to this one
-		for i:= idx; i < len(s); i++ {
-			if s[i] == Tokens[0] {
-				tokenString += string(Tokens[0])
-			} else {
-				// Check for ending space after token string
-				if s[i] == ' ' {
-					tokenString += " "
-				}
+		// Find idx of first token
+		idx := strings.Index(s, string(val))
 
-				// Replace token with generic token to search map
-				tokenString := strings.Replace(tokenString, string(Tokens[0]), "T", -1)
-				
-				// Don't need to check if key exists because 0 will be returned if it doesn't
-				sectionValue += ConfigValues[tokenString]
+		// Make sure token is found
+		if idx >= 0 {
 
-				// Reset token string and set i to next token
-				tokenString = ""
-				i = strings.Index(s[i:], string(Tokens[0]))
-				
-				// If not found, break
-				if i == -1 {
-					return sectionValue
+			// Check if empty space before token
+			if idx != 0 && s[idx - 1] == ' ' {
+				tokenString += " "
+			}
+
+			// Find all tokens adjacent to this one
+			for i := idx; i < len(s); i++ {
+				if s[i] == val {
+					tokenString += string(val)
+				} else {
+					// Check for ending space after token string
+					if s[i] == ' ' {
+						tokenString += " "
+					}
+
+					// Replace token with generic token to search map
+					tokenString = strings.Replace(tokenString, string(val), "T", -1)
+					fmt.Printf("+%s++%s+\n", s, tokenString)
+					// Don't need to check if key exists because 0 will be returned if it doesn't
+					sectionValue += mul * ConfigValues[tokenString]
+
+					// Reset token string and set i to next token
+					tokenString = ""
+					tmpI := strings.Index(s[i + 1:], string(val))
+
+					// If not found, end loop
+					if tmpI < 0 { break }
+
+					i = tmpI + i
+
+					// Check if empty space before token
+					if i != 0 && s[i] == ' ' {
+						tokenString += " "
+					}
 				}
 			}
-		}
 
-		// Add value of last token string
-		// Replace token with generic token to search map
-		tokenString := strings.Replace(tokenString, string(Tokens[0]), "T", -1)
-		
-		// Don't need to check if key exists because 0 will be returned if it doesn't
-		sectionValue += ConfigValues[tokenString]
-	} else {
-		fmt.Println(s + "WHAT THE FUCK")
+			// Add value of last token string
+			// Replace token with generic token to search map
+			tokenString = strings.Replace(tokenString, string(val), "T", -1)
+			
+			// Don't need to check if key exists because 0 will be returned if it doesn't
+			sectionValue += mul * ConfigValues[tokenString]
+		}
 	}
 
 	return sectionValue
-	
-
-
-	//val0, val1 := 0, 0
-	//fmt.Println(len(s))
-	/*for key, mapVal := range(ConfigValues) {
-		fmt.Println(key)
-		// Check if section contains any player 1 value strings or their reverses
-		tokenString := strings.Replace(key, "T", string(Tokens[0]), -1)
-		if strings.Contains(s, tokenString) {
-			
-			// Make sure maximum value string is the only one represented
-			val0 = Max(val0, mapVal * strings.Count(s, tokenString))
-		}
-
-		// Check if section contains any player 2 value strings or their reverses
-		tokenString = strings.Replace(key, "T", string(Tokens[1]), -1)
-		if strings.Contains(s, tokenString) {
-			
-			// Make sure maximum value string is the only one represented
-			val1 = Max(val1, mapVal * strings.Count(s, tokenString))
-		}
-	}
-
-	return val0 - val1*/
 }
 
 func (board *Board) checkForWin() bool {

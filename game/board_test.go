@@ -217,6 +217,7 @@ func TestCheckSectionValueJustXTokens(t *testing.T) {
 	  {"    XXX", ConfigValues["TTT "]},
 	  {"   XXX ", ConfigValues[" TTT "]},
 	  {"  XXXX ", ConfigValues["TTTT"]},
+	  {" XX XX ", 2 * ConfigValues[" TT "]},
 	}
 
 	for _, tt := range sectionValTests {
@@ -227,7 +228,7 @@ func TestCheckSectionValueJustXTokens(t *testing.T) {
 	}
 }
 
-/*func TestCheckSectionValueJustYTokens(t *testing.T) {
+func TestCheckSectionValueJustYTokens(t *testing.T) {
 	board := NewBoard()
 
 	var sectionValTests = []struct {
@@ -254,9 +255,9 @@ func TestCheckSectionValueBothTokens(t *testing.T) {
 	  s        string // input
 	  expected int // expected result
 	}{
-	  {"      XO", ConfigValues["T "]},
+	  {"     XO", ConfigValues["T "]},
 	  {"   XOX ", 2 * ConfigValues["T "]},
-	  {" XXOOOX " , ConfigValues["T "] + ConfigValues["TT "]},
+	  {" XXOOX ", ConfigValues["T "] + ConfigValues["TT "]},
 	}
 
 	for _, tt := range sectionValTests {
@@ -274,5 +275,5 @@ func TestCalcPlayerValueEmptyBoard(t *testing.T) {
 	if val != 0 {
 		t.Error("Starting Node's value should be 0 on an empty board")
 	}
-}*/
+}
 
