@@ -68,14 +68,23 @@ func (player *SmartPlayer) MakeMove(board *Board) int {
     return move
 }
 
-
-
 func buildMoveTree(board *Board, token byte) (*graph.Graph, *graph.Node) {
     g := graph.New(graph.Directed)
     startNode := g.MakeNode()
 
-    var val interface{} = board.CalcPlayerValue(token)
-    startNode.Value = &val
+    *startNode.Value = board.CalcPlayerValue(token)
+
+    for i := 0; i < NumCols; i++ {
+        if (board.IsValidMove(i)) {
+            newNode := g.MakeNode()
+            tmpBoard := *board
+            tmpBoard.MakeMove(i)
+
+            *newNode.Value = tmpBoard.CalcPlayerValue(token)
+
+            g.MakeEdge(startNode, newNode)
+        }
+    }
 
     return g, &startNode
 }

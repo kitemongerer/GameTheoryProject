@@ -170,7 +170,7 @@ func TestCheckEndGameFull(t *testing.T) {
 	board := NewBoard()
 
 	// Fill board
-	for i := 0; i < numCols * numRows; i++ {
+	for i := 0; i < NumCols * numRows; i++ {
 		if i % 2 == 0 {
 			board.MakeMove(i % 7)	
 		} else {

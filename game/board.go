@@ -24,19 +24,19 @@ var ConfigValues = map[string]int{
     "TTTT"	:	int(^uint(0)  >> 1),
 }
 
-const numCols = 7
+const NumCols = 7
 const numRows = 6
 const numDiags = 12
 
 type Board struct {
-	board [numCols][numRows]byte
+	board [NumCols][numRows]byte
 	WhoseTurn int
-	ValidMoves [numCols]bool
+	ValidMoves [NumCols]bool
 	Winner byte
 }
 
 func NewBoard() *Board {
-	var b [numCols][numRows]byte
+	var b [NumCols][numRows]byte
 
 	// Initialize all tiles to empty
 	for c, _ := range b {
@@ -45,7 +45,7 @@ func NewBoard() *Board {
 		}
 	}
 
-	var vm = [numCols]bool{true, true, true, true, true, true, true}
+	var vm = [NumCols]bool{true, true, true, true, true, true, true}
 
 	// Set it to player 0's turn
 	return &Board{WhoseTurn: 0, board: b, ValidMoves: vm, Winner: ' '}
@@ -85,13 +85,13 @@ func (board *Board) checkBoardValue(valueFunction func(string) int) int {
 
 	// Check each row
 	for i := 0; i < numRows; i++ {
-		rowSlice := make([]byte, numCols)
+		rowSlice := make([]byte, NumCols)
 
 		for j, col := range board.board {
 			rowSlice[j] = col[i]
 		}
 
-		boardValue += valueFunction(string(rowSlice[:numCols]))
+		boardValue += valueFunction(string(rowSlice[:NumCols]))
 	}
 
 	// Check each diagonal
@@ -120,7 +120,11 @@ func (board *Board) checkBoardValue(valueFunction func(string) int) int {
 }
 
 func (board *Board) CalcPlayerValue(token byte) int {
-    return board.checkBoardValue(board.checkSectionValue)
+	if token == Tokens[0] {
+		return board.checkBoardValue(board.checkSectionValue)	
+	} else {
+		return -board.checkBoardValue(board.checkSectionValue)
+	}
 }
 
 func (board *Board) checkSectionValue(s string) int {
@@ -160,7 +164,7 @@ func (board *Board) checkSectionValue(s string) int {
 
 					// Replace token with generic token to search map
 					tokenString = strings.Replace(tokenString, string(val), "T", -1)
-					fmt.Printf("+%s++%s+\n", s, tokenString)
+					
 					// Don't need to check if key exists because 0 will be returned if it doesn't
 					sectionValue += mul * ConfigValues[tokenString]
 
@@ -231,7 +235,7 @@ func (board *Board) Print() {
 
 	// Print each row
 	for r := numRows - 1; r >= 0; r-- {
-		for c := 0; c < numCols; c++ {
+		for c := 0; c < NumCols; c++ {
 			fmt.Printf("| %c ", board.board[c][r])
 		}
 

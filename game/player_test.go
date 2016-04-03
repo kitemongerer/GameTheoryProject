@@ -65,14 +65,30 @@ func TestSmartPlayerInitialize(t *testing.T) {
 }
 
 
-
-/*func TestBuildMoveTreeEmptyBoard(t *testing.T) {
+func TestBuildMoveTreeEmptyBoard(t *testing.T) {
 	board := NewBoard()
-	_, start := buildMoveTree(board, 'X')
-
+	g, start := buildMoveTree(board, 'X')
+	
 	if (*start.Value).(int) != 0 {
 		t.Error("Starting Node's value should be 0 on an empty board")
 	}
-}*/
+
+	if len(g.Neighbors(*start)) != NumCols {
+		t.Error("Move tree should contain all columns on empty board")	
+	}
+
+	for i, node := range g.Neighbors(*start) {
+		val := *node.Value
+		if i == 0 || i == NumCols - 1 {
+			if (val).(int) != 3 * ConfigValues["T "] {
+				t.Errorf("Player value after moving on end columns should be %d not %d",  3 * ConfigValues["T "], val)	
+			}
+		} else {
+			if (val).(int) != ConfigValues[" T "] + 3 * ConfigValues["T "] {
+				t.Errorf("Player value after moving on end columns should be %d not %d", ConfigValues[" T "] + 2 * ConfigValues["T "], val)
+			}
+		}
+	}
+}
 
 
