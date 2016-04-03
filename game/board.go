@@ -126,6 +126,12 @@ func (board *Board) CalcPlayerValue(token byte) int {
 func (board *Board) checkSectionValue(s string) int {
 	sectionValue := 0
 	tokenString := ""
+fmt.Println(s)
+	// Check for win
+	if strings.Contains(strings.Replace(s, string(Tokens[0]), "T", -1), "TTTT") {
+		return ConfigValues["TTTT"]
+	}
+
 	// Find idx of first token
 	idx := strings.Index(s, string(Tokens[0]))
 
@@ -143,17 +149,35 @@ func (board *Board) checkSectionValue(s string) int {
 				tokenString += string(Tokens[0])
 			} else {
 				// Check for ending space after token string
-				if i != len(s) - 1 && s[i + 1] == ' ' {
+				if s[i] == ' ' {
 					tokenString += " "
 				}
 
 				// Replace token with generic token to search map
 				tokenString := strings.Replace(tokenString, string(Tokens[0]), "T", -1)
-
+				
 				// Don't need to check if key exists because 0 will be returned if it doesn't
 				sectionValue += ConfigValues[tokenString]
+
+				// Reset token string and set i to next token
+				tokenString = ""
+				i = strings.Index(s[i:], string(Tokens[0]))
+				
+				// If not found, break
+				if i == -1 {
+					return sectionValue
+				}
 			}
 		}
+
+		// Add value of last token string
+		// Replace token with generic token to search map
+		tokenString := strings.Replace(tokenString, string(Tokens[0]), "T", -1)
+		
+		// Don't need to check if key exists because 0 will be returned if it doesn't
+		sectionValue += ConfigValues[tokenString]
+	} else {
+		fmt.Println(s + "WHAT THE FUCK")
 	}
 
 	return sectionValue

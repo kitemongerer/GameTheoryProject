@@ -227,7 +227,7 @@ func TestCheckSectionValueJustXTokens(t *testing.T) {
 	}
 }
 
-func TestCheckSectionValueJustYTokens(t *testing.T) {
+/*func TestCheckSectionValueJustYTokens(t *testing.T) {
 	board := NewBoard()
 
 	var sectionValTests = []struct {
@@ -274,5 +274,5 @@ func TestCalcPlayerValueEmptyBoard(t *testing.T) {
 	if val != 0 {
 		t.Error("Starting Node's value should be 0 on an empty board")
 	}
-}
+}*/
 
