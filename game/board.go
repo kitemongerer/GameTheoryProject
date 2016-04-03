@@ -11,10 +11,13 @@ var Tokens = [2]byte{'X', 'O'}
 // configuration of tokens (T) and empty spaces
 var ConfigValues = map[string]int{
     "T "	:	1,
+    " T"	:	1,
     " T "	:	2,
     "TT "	:	3,
+    " TT"	:	3,
     " TT "	:	4,
     "TTT "	:	5,
+    " TTT"	:	5,
     " TTT "	:	6,
     
     // Maximum integer value since it is a win
@@ -121,30 +124,64 @@ func (board *Board) CalcPlayerValue(token byte) int {
 }
 
 func (board *Board) checkSectionValue(s string) int {
-	val0, val1 := 0, 0
-	for key, mapVal := range(ConfigValues) {
+	sectionValue := 0
+	tokenString := ""
+	// Find idx of first token
+	idx := strings.Index(s, string(Tokens[0]))
+
+	// Make sure token is found
+	if idx != -1 {
+
+		// Check if empty space before token
+		if idx != 0 && s[idx - 1] == ' ' {
+			tokenString += " "
+		}
+
+		// Find all tokens adjacent to this one
+		for i:= idx; i < len(s); i++ {
+			if s[i] == Tokens[0] {
+				tokenString += string(Tokens[0])
+			} else {
+				// Check for ending space after token string
+				if i != len(s) - 1 && s[i + 1] == ' ' {
+					tokenString += " "
+				}
+
+				// Replace token with generic token to search map
+				tokenString := strings.Replace(tokenString, string(Tokens[0]), "T", -1)
+
+				// Don't need to check if key exists because 0 will be returned if it doesn't
+				sectionValue += ConfigValues[tokenString]
+			}
+		}
+	}
+
+	return sectionValue
+	
+
+
+	//val0, val1 := 0, 0
+	//fmt.Println(len(s))
+	/*for key, mapVal := range(ConfigValues) {
+		fmt.Println(key)
 		// Check if section contains any player 1 value strings or their reverses
 		tokenString := strings.Replace(key, "T", string(Tokens[0]), -1)
-		reverseTokenString := Reverse(tokenString)
-		if strings.Contains(s, tokenString) ||
-			strings.Contains(s, reverseTokenString) {
+		if strings.Contains(s, tokenString) {
 			
 			// Make sure maximum value string is the only one represented
-			val0 = Max(val0, mapVal * (strings.Count(s, tokenString), strings.Count(s, reverse)))
+			val0 = Max(val0, mapVal * strings.Count(s, tokenString))
 		}
 
 		// Check if section contains any player 2 value strings or their reverses
 		tokenString = strings.Replace(key, "T", string(Tokens[1]), -1)
-		reverseTokenString = Reverse(tokenString)
-		if strings.Contains(s, tokenString) ||
-			strings.Contains(s, reverseTokenString) {
+		if strings.Contains(s, tokenString) {
 			
 			// Make sure maximum value string is the only one represented
-			val1 = Max(val1, mapVal * (strings.Count(s, tokenString), strings.Count(s, reverse)))
+			val1 = Max(val1, mapVal * strings.Count(s, tokenString))
 		}
 	}
 
-	return val0 - val1
+	return val0 - val1*/
 }
 
 func (board *Board) checkForWin() bool {

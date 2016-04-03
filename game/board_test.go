@@ -205,125 +205,65 @@ func TestCheckEndGameNotFullNotWin(t *testing.T) {
 func TestCheckSectionValueJustXTokens(t *testing.T) {
 	board := NewBoard()
 
-
-	s := "       "
-
-	val := board.checkSectionValue(s)
-
-	if val != 0 {
-		t.Error("Empty section should have 0 value.")
+	var sectionValTests = []struct {
+	  s        string // input
+	  expected int // expected result
+	}{
+	  {"       ", 0},
+	  {"      X", ConfigValues["T "]},
+	  {"    X  ", ConfigValues[" T "]},
+	  {"     XX", ConfigValues["TT "]},
+	  {"    XX ", ConfigValues[" TT "]},
+	  {"    XXX", ConfigValues["TTT "]},
+	  {"   XXX ", ConfigValues[" TTT "]},
+	  {"  XXXX ", ConfigValues["TTTT"]},
 	}
 
-	s = "      X"
-
-	val = board.checkSectionValue(s)
-
-	if val != ConfigValues["T "] {
-		t.Error("Section should have correct value for: \"" + s + "\"")
-	}
-
-	s = "    X  "
-
-	val = board.checkSectionValue(s)
-
-	if val != ConfigValues[" T "] {
-		t.Error("Section should have correct value for: \"" + s + "\"")
-	}
-
-	s = "     XX"
-
-	val = board.checkSectionValue(s)
-
-	if val != ConfigValues["TT "] {
-		t.Error("Section should have correct value for: \"" + s + "\"")
-	}
-
-	s = "    XX " 
-
-	val = board.checkSectionValue(s)
-
-	if val != ConfigValues[" TT "] {
-		t.Error("Section should have correct value for: \"" + s + "\"")
-	}
-
-	s = "    XXX"
-
-	val = board.checkSectionValue(s)
-
-	if val != ConfigValues["TTT "] {
-		t.Error("Section should have correct value for: \"" + s + "\"")
-	}
-
-	s = "   XXX " 
-
-	val = board.checkSectionValue(s)
-
-	if val != ConfigValues[" TTT "] {
-		t.Error("Section should have correct value for: \"" + s + "\"")
-	}
-
-	s = "  XXXX " 
-
-	val = board.checkSectionValue(s)
-
-	if val != ConfigValues["TTTT"] {
-		t.Error("Section should have correct value for: \"" + s + "\"")
+	for _, tt := range sectionValTests {
+		actual := board.checkSectionValue(tt.s)
+		if actual != tt.expected {
+			t.Errorf("Section should have correct value [%d] not %d for: \"%s\"", tt.expected, actual, tt.s)
+		}
 	}
 }
 
 func TestCheckSectionValueJustYTokens(t *testing.T) {
 	board := NewBoard()
 
-	s := "      O"
-
-	val := board.checkSectionValue(s)
-
-	if val != -ConfigValues["T "] {
-		t.Error("Section should have correct value for: \"" + s + "\"")
+	var sectionValTests = []struct {
+	  s        string // input
+	  expected int // expected result
+	}{
+	  {"      O", -ConfigValues["T "]},
+	  {"   OOO ", -ConfigValues[" TTT "]},
+	  {"  OOOO ", -ConfigValues["TTTT"]},
 	}
 
-	s = "   OOO " 
-
-	val = board.checkSectionValue(s)
-
-	if val != -ConfigValues[" TTT "] {
-		t.Error("Section should have correct value for: \"" + s + "\"")
-	}
-
-	s = "  OOOO " 
-
-	val = board.checkSectionValue(s)
-
-	if val != -ConfigValues["TTTT"] {
-		t.Error("Section should have correct value for: \"" + s + "\"")
+	for _, tt := range sectionValTests {
+		actual := board.checkSectionValue(tt.s)
+		if actual != tt.expected {
+			t.Errorf("Section should have correct value [%d] not %d for: \"%s\"", tt.expected, actual, tt.s)
+		}
 	}
 }
 
 func TestCheckSectionValueBothTokens(t *testing.T) {
 	board := NewBoard()
 
-	s := "      XO"
-
-	val := board.checkSectionValue(s)
-
-	if val != ConfigValues["T "] {
-		t.Error("Section should have correct value for: \"" + s + "\"")
+	var sectionValTests = []struct {
+	  s        string // input
+	  expected int // expected result
+	}{
+	  {"      XO", ConfigValues["T "]},
+	  {"   XOX ", 2 * ConfigValues["T "]},
+	  {" XXOOOX " , ConfigValues["T "] + ConfigValues["TT "]},
 	}
 
-	s = "   XOX " 
-
-	val = board.checkSectionValue(s)
-
-	if val != 2 * ConfigValues["T "] {
-		t.Error("Section should have correct value for: \"" + s + "\"")
-	}
-
-	s = " XXOOOX " 
-
-	val = board.checkSectionValue(s)
-
-	if val != ConfigValues["T "] + ConfigValues["TT "] {
-		t.Error("Section should have correct value for: \"" + s + "\"")
+	for _, tt := range sectionValTests {
+		actual := board.checkSectionValue(tt.s)
+		if actual != tt.expected {
+			t.Errorf("Section should have correct value [%d] not %d for: \"%s\"", tt.expected, actual, tt.s)
+		}
 	}
 }
 
