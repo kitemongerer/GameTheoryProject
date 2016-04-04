@@ -54,7 +54,7 @@ func (player *HumanPlayer) MakeMove(board *Board) int {
 }
 
 type SmartPlayer struct {
-    piece byte
+    Piece byte
 }
 
 func NewSmartPlayer(playerIdx int) *SmartPlayer {
@@ -66,6 +66,27 @@ func (player *SmartPlayer) MakeMove(board *Board) int {
     move := 1
 
     return move
+}
+
+func buildMoveTree(numLayers int, board *Board, token byte) (*graph.Graph, *graph.Node) {
+    g := graph.New(graph.Directed)
+    startNode := g.MakeNode()
+    valSlice := make([]int, 0, 1)
+    *startNode.Value = valSlice
+
+    tmp := make([]graph.Node, 1)
+    tmp[0] = startNode
+    nodeList := &tmp
+
+    for i:= 0; i < numLayers; i++ {
+        for _, node := range *nodeList {
+            fmt.Println(node)
+            nodeBoard := buildBoardFromMoveList((*node.Value).([]int))
+            buildMoveTreeLayer(nodeBoard, g, &node)
+        }
+    }
+
+    return g, &startNode
 }
 
 func buildMoveTreeLayer(board *Board, g *graph.Graph, startNode *graph.Node) {

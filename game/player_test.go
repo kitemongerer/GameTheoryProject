@@ -65,9 +65,9 @@ func TestSmartPlayerInitialize(t *testing.T) {
 	}	
 }
 
-/*func TestBuildMoveTree(t *testing.T) {
+func TestBuildMoveTree(t *testing.T) {
 	board := NewBoard()
-	g, start := buildMoveTree(board, 'X')
+	g, start := buildMoveTree(1, board, 'X')
 
 	if len((*start.Value).([]int)) != 0 {
 		t.Error("Starting Node's move history should have length 0 on an empty board")
@@ -76,7 +76,7 @@ func TestSmartPlayerInitialize(t *testing.T) {
 	if len(g.Neighbors(*start)) != NumCols {
 		t.Error("Move tree should contain all columns on empty board")	
 	}
-}*/
+}
 
 
 func TestBuildMoveTreeLayerEmptyBoard(t *testing.T) {
