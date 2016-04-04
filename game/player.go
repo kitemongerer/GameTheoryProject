@@ -68,11 +68,8 @@ func (player *SmartPlayer) MakeMove(board *Board) int {
     return move
 }
 
-func buildMoveTree(board *Board, token byte) (*graph.Graph, *graph.Node) {
-    g := graph.New(graph.Directed)
-    startNode := g.MakeNode()
-
-    *startNode.Value = board.CalcPlayerValue(token)
+func buildMoveTreeLayer(board *Board, g *graph.Graph, startNode *graph.Node) {
+    valSlice := (*startNode.Value).([]int)
 
     for i := 0; i < NumCols; i++ {
         if (board.IsValidMove(i)) {
@@ -80,12 +77,21 @@ func buildMoveTree(board *Board, token byte) (*graph.Graph, *graph.Node) {
             tmpBoard := *board
             tmpBoard.MakeMove(i)
 
-            *newNode.Value = tmpBoard.CalcPlayerValue(token)
+            // Create new move history array
+            tmp := make([]int, len(valSlice), cap(valSlice) + 1)
+            copy(tmp, valSlice)
+            tmp = append(tmp, i)
+            *newNode.Value = tmp
 
-            g.MakeEdge(startNode, newNode)
+            g.MakeEdge(*startNode, newNode)
         }
     }
-
-    return g, &startNode
 }
 
+func buildBoardFromMoveList(moveList []int) *Board {
+    board := NewBoard()
+    for _, val := range moveList {
+        board.MakeMove(val)
+    }
+    return board
+}

@@ -1,6 +1,7 @@
 package game
 
 import "testing"
+import "github.com/twmb/algoimpl/go/graph"
 
 func TestRandomMakeMove(t *testing.T) {
 	var player RandomPlayer
@@ -64,30 +65,71 @@ func TestSmartPlayerInitialize(t *testing.T) {
 	}	
 }
 
-
-func TestBuildMoveTreeEmptyBoard(t *testing.T) {
+/*func TestBuildMoveTree(t *testing.T) {
 	board := NewBoard()
 	g, start := buildMoveTree(board, 'X')
-	
-	if (*start.Value).(int) != 0 {
-		t.Error("Starting Node's value should be 0 on an empty board")
+
+	if len((*start.Value).([]int)) != 0 {
+		t.Error("Starting Node's move history should have length 0 on an empty board")
 	}
 
 	if len(g.Neighbors(*start)) != NumCols {
 		t.Error("Move tree should contain all columns on empty board")	
 	}
+}*/
 
-	for i, node := range g.Neighbors(*start) {
-		val := *node.Value
-		if i == 0 || i == NumCols - 1 {
-			if (val).(int) != 3 * ConfigValues["T "] {
-				t.Errorf("Player value after moving on end columns should be %d not %d",  3 * ConfigValues["T "], val)	
-			}
-		} else {
-			if (val).(int) != ConfigValues[" T "] + 3 * ConfigValues["T "] {
-				t.Errorf("Player value after moving on end columns should be %d not %d", ConfigValues[" T "] + 2 * ConfigValues["T "], val)
-			}
+
+func TestBuildMoveTreeLayerEmptyBoard(t *testing.T) {
+	board := NewBoard()
+	g := graph.New(graph.Directed)
+    startNode := g.MakeNode()
+    valSlice := make([]int, 0, 1)
+    *startNode.Value = valSlice
+	
+	buildMoveTreeLayer(board, g, &startNode)
+
+	if len(g.Neighbors(startNode)) != NumCols {
+		t.Error("Move tree should contain all columns on empty board")	
+	}
+
+	for i, node := range g.Neighbors(startNode) {
+		val := (*node.Value).([]int)
+
+		if len(val) != 1 {
+			t.Error("Node's move history should have length 1 after first set of moves")
 		}
+
+		if val[0] != i {
+			t.Errorf("Node's move history should contain correct moves(%d not %d)", i, val[0])
+		}
+	}
+}
+
+func TestBuildBoardFromMoveList(t *testing.T) {
+	moveList := make([]int, 0, 5)
+	board := buildBoardFromMoveList(moveList)
+
+	// Check that no tokens were added
+	if board.CalcPlayerValue('X') != 0 {
+		t.Error("No moves should have been made from empty move list.")
+	}
+
+	moveList = append(moveList, 0)
+	board = buildBoardFromMoveList(moveList)
+	// Check that token was added
+	if board.board[0][0] != 'X' {
+		t.Error("Should have built board with single move.")
+	}
+
+	moveList = append(moveList, 0)
+	board = buildBoardFromMoveList(moveList)
+	// Check that first token was added
+	if board.board[0][0] != 'X' {
+		t.Error("Should have built board with first token in correct spot.")
+	}
+	// Check that second token was added
+	if board.board[0][1] != 'O' {
+		t.Error("Should have built board with alternating tokens.")
 	}
 }
 
