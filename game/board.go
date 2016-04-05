@@ -51,6 +51,25 @@ func NewBoard() *Board {
 	return &Board{WhoseTurn: 0, board: b, ValidMoves: vm, Winner: ' '}
 }
 
+func (oldBoard *Board) DuplicateBoard() *Board {
+	var b [NumCols][numRows]byte
+
+	// Initialize all tiles to old board tiles
+	for c, _ := range b {
+		for r, _ := range b[c] {
+			b[c][r] = oldBoard.board[c][r]
+		}
+	}
+
+	var vm [NumCols]bool
+	for i := 0; i < NumCols; i++ {
+		vm[i] = oldBoard.ValidMoves[i]
+	}
+
+	// Set it to player 0's turn
+	return &Board{WhoseTurn: oldBoard.WhoseTurn, board: b, ValidMoves: vm, Winner: oldBoard.Winner}
+}
+
 func (board *Board) MakeMove(col int) {
 	// Put corresponding piece on board in lowest open spot on column
 	for i, val := range board.board[col] {
@@ -80,7 +99,11 @@ func (board *Board) checkBoardValue(valueFunction func(string) int) int {
 
 	// Check each column
 	for _, col := range board.board {
-		boardValue += valueFunction(string(col[:numRows]))
+		val := valueFunction(string(col[:numRows]))
+		if val == int(^uint(0)  >> 1) || val == -int(^uint(0)  >> 1) {
+			return val
+		}
+		boardValue += val
 	}
 
 	// Check each row
@@ -91,7 +114,11 @@ func (board *Board) checkBoardValue(valueFunction func(string) int) int {
 			rowSlice[j] = col[i]
 		}
 
-		boardValue += valueFunction(string(rowSlice[:NumCols]))
+		val := valueFunction(string(rowSlice[:NumCols]))
+		if val == int(^uint(0)  >> 1) || val == -int(^uint(0)  >> 1) {
+			return val
+		}
+		boardValue += val
 	}
 
 	// Check each diagonal
@@ -112,14 +139,24 @@ func (board *Board) checkBoardValue(valueFunction func(string) int) int {
 			rightDiagslice[j] = board.board[Min(i, 6) - j][5 - (Max(0, i - 6) + j)]
 		}
 
-		boardValue += valueFunction(string(leftDiagSlice[:len(leftDiagSlice)]))
-		boardValue += valueFunction(string(rightDiagslice[:len(rightDiagslice)]))
+		val := valueFunction(string(leftDiagSlice[:len(leftDiagSlice)]))
+		if val == int(^uint(0)  >> 1) || val == -int(^uint(0)  >> 1) {
+			return val
+		}
+		boardValue += val
+
+		val = valueFunction(string(rightDiagslice[:len(rightDiagslice)]))
+		if val == int(^uint(0)  >> 1) || val == -int(^uint(0)  >> 1) {
+			return val
+		}
+		boardValue += val
 	}
 	
 	return boardValue
 }
 
 func (board *Board) CalcPlayerValue(token byte) int {
+	// checkSectionValue always returns value for player X
 	if token == Tokens[0] {
 		return board.checkBoardValue(board.checkSectionValue)	
 	} else {

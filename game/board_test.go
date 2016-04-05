@@ -164,6 +164,17 @@ func TestCheckEndGameWin(t *testing.T) {
 	if !board.CheckEndGame() {
 		t.Error("One player has won. Should be end of game!")
 	}
+
+	// Diagonal win
+	board = NewBoard()
+	board.board[1][0] = 'X'
+	board.board[2][1] = 'X'
+	board.board[3][2] = 'X'
+	board.board[4][3] = 'X'
+	
+	if !board.CheckEndGame() {
+		t.Error("One player has won. Should be end of game!")
+	}
 }
 
 func TestCheckEndGameFull(t *testing.T) {
@@ -274,6 +285,35 @@ func TestCalcPlayerValueEmptyBoard(t *testing.T) {
 
 	if val != 0 {
 		t.Error("Starting Node's value should be 0 on an empty board")
+	}
+}
+
+func TestCalcPlayerValue(t *testing.T) {
+	board := NewBoard()
+	for i:= 0; i < 3; i++ {
+		board.MakeMove(1)	
+		board.MakeMove(0)
+	}
+	board.MakeMove(1)
+	
+	val := board.CalcPlayerValue('O')
+
+	if val != -ConfigValues["TTTT"] {
+		t.Errorf("X won so value to O should be %d not %d", -ConfigValues["TTTT"], val)
+	}
+
+	board = NewBoard()
+	for i:= 0; i < 3; i++ {
+		board.MakeMove(1)	
+		board.MakeMove(0)
+	}
+	board.MakeMove(1)
+	board.board[0][2] = 'X'
+	
+	val = board.CalcPlayerValue('X')
+
+	if val < 0 {
+		t.Errorf("X won so value to O should be greater than 0 not %d", val)
 	}
 }
 

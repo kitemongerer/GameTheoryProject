@@ -65,38 +65,38 @@ func NewSmartPlayer(playerIdx int, numLayers int) *SmartPlayer {
 func (player *SmartPlayer) MakeMove(board *Board) int {
     g, startNode, _ := buildMoveTree(player.NumLayers, board, player.Piece)
 
-    _, arr := backwardsInduct(g, startNode, player.Piece)
+    _, arr := backwardsInduct(g, startNode, player.Piece, board)
 
     board.MakeMove(arr[0])
 
     return arr[0]
-
-    /*for i, leaf := range *leaves {
-        tmpVal := buildBoardFromMoveList((*leaf.Value).([]int)).CalcPlayerValue(player.Piece)
-        if (tmpVal > value) {
-            value = tmpVal
-            idx = i
-        }
-    }
-
-    // Return first move in move path to get there
-    return (*(*leaves)[idx].Value).([]int)[0]*/
 }
 
-func backwardsInduct(g *graph.Graph, startNode *graph.Node, token byte) (int, []int) {
+func backwardsInduct(g *graph.Graph, startNode *graph.Node, token byte, originalBoard *Board) (int, []int) {
     if len(g.Neighbors(*startNode)) > 0 {
         value := -int(^uint(0)  >> 1)
         idx := 0
         for i, node := range g.Neighbors(*startNode) {
-            tmpVal, _ := backwardsInduct(g, &node, nextToken(token))
+            tmpVal, _ := backwardsInduct(g, &node, token, originalBoard)
             if tmpVal > value {
                 value = tmpVal
                 idx = i
+            // If there are two equal values, choose randomly
+            } else if tmpVal == value {
+                source := rand.NewSource(time.Now().UnixNano())
+                rand := rand.New(source)
+                
+                // Random between 0 and 1
+                tmp := rand.Intn(2)
+                if tmp == 0 {
+                    value = tmpVal
+                    idx = i
+                }
             }
         }
         return value, (*g.Neighbors(*startNode)[idx].Value).([]int)
     } else {
-        val := buildBoardFromMoveList((*startNode.Value).([]int)).CalcPlayerValue(nextToken(token))
+        val := buildBoardFromMoveList((*startNode.Value).([]int), originalBoard).CalcPlayerValue(nextToken(token))
         return val, (*startNode.Value).([]int)
     }
 }
@@ -122,7 +122,7 @@ func buildMoveTree(numLayers int, board *Board, token byte) (*graph.Graph, *grap
     for i:= 0; i < numLayers; i++ {
         newNodeList := make([]graph.Node, 0, len(*nodeList) * NumCols)
         for _, node := range *nodeList {
-            nodeBoard := buildBoardFromMoveList((*node.Value).([]int))
+            nodeBoard := buildBoardFromMoveList((*node.Value).([]int), board)
             buildMoveTreeLayer(nodeBoard, g, &node)
             newNodeList = append(newNodeList, g.Neighbors(node)...)
         }
@@ -152,8 +152,8 @@ func buildMoveTreeLayer(board *Board, g *graph.Graph, startNode *graph.Node) {
     }
 }
 
-func buildBoardFromMoveList(moveList []int) *Board {
-    board := NewBoard()
+func buildBoardFromMoveList(moveList []int, oldBoard *Board) *Board {
+    board := oldBoard.DuplicateBoard()
     for _, val := range moveList {
         board.MakeMove(val)
     }

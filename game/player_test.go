@@ -66,6 +66,7 @@ func TestSmartPlayerInitialize(t *testing.T) {
 }
 
 func TestBuildMoveTree(t *testing.T) {
+	// Check 1 deep empty board
 	board := NewBoard()
 	g, start, _ := buildMoveTree(1, board, 'X')
 
@@ -77,6 +78,7 @@ func TestBuildMoveTree(t *testing.T) {
 		t.Error("Move tree should contain all columns on empty board")	
 	}
 
+	// Check 2 deep empty board
 	board = NewBoard()
 	g, start, _ = buildMoveTree(2, board, 'X')
 
@@ -95,6 +97,22 @@ func TestBuildMoveTree(t *testing.T) {
 		if len(secondNeighbors) != NumCols {
 			t.Error("Second layer neighbors should also contain all columns")	
 		}
+	}
+
+	// Check 1 deep row 1 full
+	board = NewBoard()
+	for i := 0; i < 6; i++ {
+		board.MakeMove(1)
+	}
+
+	g, start, _ = buildMoveTree(1, board, 'X')
+
+	if len((*start.Value).([]int)) != 0 {
+		t.Error("Starting Node's move history should have length 0 on an empty board")
+	}
+
+	if len(g.Neighbors(*start)) != NumCols - 1 {
+		t.Error("Move tree should contain all columns except column 1 since it is full")	
 	}
 }
 
@@ -127,7 +145,7 @@ func TestBuildMoveTreeLayerEmptyBoard(t *testing.T) {
 
 func TestBuildBoardFromMoveList(t *testing.T) {
 	moveList := make([]int, 0, 5)
-	board := buildBoardFromMoveList(moveList)
+	board := buildBoardFromMoveList(moveList, NewBoard())
 
 	// Check that no tokens were added
 	if board.CalcPlayerValue('X') != 0 {
@@ -135,14 +153,14 @@ func TestBuildBoardFromMoveList(t *testing.T) {
 	}
 
 	moveList = append(moveList, 0)
-	board = buildBoardFromMoveList(moveList)
+	board = buildBoardFromMoveList(moveList, NewBoard())
 	// Check that token was added
 	if board.board[0][0] != 'X' {
 		t.Error("Should have built board with single move.")
 	}
 
 	moveList = append(moveList, 0)
-	board = buildBoardFromMoveList(moveList)
+	board = buildBoardFromMoveList(moveList, NewBoard())
 	// Check that first token was added
 	if board.board[0][0] != 'X' {
 		t.Error("Should have built board with first token in correct spot.")

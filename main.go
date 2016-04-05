@@ -26,7 +26,18 @@ func main() {
 
 	for i := 0; i < numReps; i++ {
 		wg.Add(1)
-		go executeGame(i, &victorySlice, wg)
+
+		// Redefine players in for loop to avoid
+		// parallelization trying to kill you
+		var p1 = game.NewSmartPlayer(0, 1)
+		var p2 = game.NewSmartPlayer(1, 1)
+		
+		// Execute games switching off which player goes first
+		if 1 % 2 == 0 {
+			go executeGame(p1, p2, i, &victorySlice, wg)
+		} else {
+			go executeGame(p2, p1, i, &victorySlice, wg)
+		}
 	}
 
 	wg.Wait()
@@ -47,20 +58,19 @@ func main() {
 	fmt.Println("Simulation complete.")
 }
 
-func executeGame(idx int, victorySlice *[]byte, wg *sync.WaitGroup) {
+func executeGame(p1, p2 game.Player, idx int, victorySlice *[]byte, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var b = game.NewBoard()
 
-	var p1 = game.NewSmartPlayer(0, 2)
-	var p2 game.RandomPlayer
-
 	for !b.CheckEndGame() {
 		p1.MakeMove(b)
-
+		//b.Print()
 		// If p1 didn't win, p2 gets to move
 		if (!b.CheckEndGame()) {
 			p2.MakeMove(b)
 		}
+		//b.Print()
+		//fmt.Println(b.CalcPlayerValue('O'))
 	}
 
 	(*victorySlice)[idx] = b.Winner
