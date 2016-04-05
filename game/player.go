@@ -55,20 +55,61 @@ func (player *HumanPlayer) MakeMove(board *Board) int {
 
 type SmartPlayer struct {
     Piece byte
+    NumLayers int
 }
 
-func NewSmartPlayer(playerIdx int) *SmartPlayer {
-    // Set it to player 0's turn
-    return &SmartPlayer{piece: Tokens[playerIdx]}
+func NewSmartPlayer(playerIdx int, numLayers int) *SmartPlayer {
+    return &SmartPlayer{Piece: Tokens[playerIdx], NumLayers: numLayers}
 }
 
 func (player *SmartPlayer) MakeMove(board *Board) int {
-    move := 1
+    g, startNode, _ := buildMoveTree(player.NumLayers, board, player.Piece)
 
-    return move
+    _, arr := backwardsInduct(g, startNode, player.Piece)
+
+    board.MakeMove(arr[0])
+
+    return arr[0]
+
+    /*for i, leaf := range *leaves {
+        tmpVal := buildBoardFromMoveList((*leaf.Value).([]int)).CalcPlayerValue(player.Piece)
+        if (tmpVal > value) {
+            value = tmpVal
+            idx = i
+        }
+    }
+
+    // Return first move in move path to get there
+    return (*(*leaves)[idx].Value).([]int)[0]*/
 }
 
-func buildMoveTree(numLayers int, board *Board, token byte) (*graph.Graph, *graph.Node) {
+func backwardsInduct(g *graph.Graph, startNode *graph.Node, token byte) (int, []int) {
+    if len(g.Neighbors(*startNode)) > 0 {
+        value := -int(^uint(0)  >> 1)
+        idx := 0
+        for i, node := range g.Neighbors(*startNode) {
+            tmpVal, _ := backwardsInduct(g, &node, nextToken(token))
+            if tmpVal > value {
+                value = tmpVal
+                idx = i
+            }
+        }
+        return value, (*g.Neighbors(*startNode)[idx].Value).([]int)
+    } else {
+        val := buildBoardFromMoveList((*startNode.Value).([]int)).CalcPlayerValue(nextToken(token))
+        return val, (*startNode.Value).([]int)
+    }
+}
+
+func nextToken(token byte) byte {
+    if Tokens[0] == token {
+        return Tokens[1]
+    } else {
+        return Tokens[0]
+    }
+}
+
+func buildMoveTree(numLayers int, board *Board, token byte) (*graph.Graph, *graph.Node, *[]graph.Node) {
     g := graph.New(graph.Directed)
     startNode := g.MakeNode()
     valSlice := make([]int, 0, 1)
@@ -79,14 +120,16 @@ func buildMoveTree(numLayers int, board *Board, token byte) (*graph.Graph, *grap
     nodeList := &tmp
 
     for i:= 0; i < numLayers; i++ {
+        newNodeList := make([]graph.Node, 0, len(*nodeList) * NumCols)
         for _, node := range *nodeList {
-            fmt.Println(node)
             nodeBoard := buildBoardFromMoveList((*node.Value).([]int))
             buildMoveTreeLayer(nodeBoard, g, &node)
+            newNodeList = append(newNodeList, g.Neighbors(node)...)
         }
+        nodeList = &newNodeList
     }
 
-    return g, &startNode
+    return g, &startNode, nodeList
 }
 
 func buildMoveTreeLayer(board *Board, g *graph.Graph, startNode *graph.Node) {

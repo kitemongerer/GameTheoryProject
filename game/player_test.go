@@ -52,22 +52,22 @@ func TestRandomMakeInvalidMove(t *testing.T) {
 }
 
 func TestSmartPlayerInitialize(t *testing.T) {
-	player := NewSmartPlayer(1)
+	player := NewSmartPlayer(1, 1)
 
-	if player.piece != 'O' {
+	if player.Piece != 'O' {
 		t.Error("Player 2 should have piece O.")
 	}
 
-	player = NewSmartPlayer(0)
+	player = NewSmartPlayer(0, 1)
 	
-	if player.piece != 'X' {
+	if player.Piece != 'X' {
 		t.Error("Player 1 should have piece X.")
 	}	
 }
 
 func TestBuildMoveTree(t *testing.T) {
 	board := NewBoard()
-	g, start := buildMoveTree(1, board, 'X')
+	g, start, _ := buildMoveTree(1, board, 'X')
 
 	if len((*start.Value).([]int)) != 0 {
 		t.Error("Starting Node's move history should have length 0 on an empty board")
@@ -75,6 +75,26 @@ func TestBuildMoveTree(t *testing.T) {
 
 	if len(g.Neighbors(*start)) != NumCols {
 		t.Error("Move tree should contain all columns on empty board")	
+	}
+
+	board = NewBoard()
+	g, start, _ = buildMoveTree(2, board, 'X')
+
+	if len((*start.Value).([]int)) != 0 {
+		t.Error("Starting Node's move history should have length 0 on an empty board")
+	}
+
+	neighbors := g.Neighbors(*start);
+
+	if len(neighbors) != NumCols {
+		t.Error("Move tree should contain all columns on empty board")	
+	}
+
+	for _, node := range neighbors {
+		secondNeighbors := g.Neighbors(node)
+		if len(secondNeighbors) != NumCols {
+			t.Error("Second layer neighbors should also contain all columns")	
+		}
 	}
 }
 
