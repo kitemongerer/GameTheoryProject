@@ -45,7 +45,7 @@ func (player *HumanPlayer) MakeMove(board *Board) int {
     fmt.Print("Enter column (1-7): ")
     text, _ := reader.ReadString('\n')
     move, _ := strconv.Atoi(strings.TrimSpace(text))
-    fmt.Println(move)
+    //fmt.Println(move)
 
     // User move will be 1-indexed. We want 0 indexed
     board.MakeMove(move - 1)
@@ -68,16 +68,18 @@ func (player *SmartPlayer) MakeMove(board *Board) int {
     _, arr := backwardsInduct(g, startNode, player.Piece, board)
 
     board.MakeMove(arr[0])
-
     return arr[0]
 }
 
 func backwardsInduct(g *graph.Graph, startNode *graph.Node, token byte, originalBoard *Board) (int, []int) {
     if len(g.Neighbors(*startNode)) > 0 {
+        // most negative value
         value := -int(^uint(0)  >> 1)
         idx := 0
+        //fmt.Printf("Token: %c ", token)
         for i, node := range g.Neighbors(*startNode) {
-            tmpVal, _ := backwardsInduct(g, &node, token, originalBoard)
+            tmpVal, _ := backwardsInduct(g, &node, nextToken(token), originalBoard)
+          //  fmt.Printf("%d, ", tmpVal)
             if tmpVal > value {
                 value = tmpVal
                 idx = i
@@ -94,7 +96,10 @@ func backwardsInduct(g *graph.Graph, startNode *graph.Node, token byte, original
                 }
             }
         }
-        return value, (*g.Neighbors(*startNode)[idx].Value).([]int)
+        //fmt.Printf("\n")
+
+        chosenMoveList := (*g.Neighbors(*startNode)[idx].Value).([]int)
+        return -value, chosenMoveList
     } else {
         val := buildBoardFromMoveList((*startNode.Value).([]int), originalBoard).CalcPlayerValue(nextToken(token))
         return val, (*startNode.Value).([]int)
@@ -123,8 +128,12 @@ func buildMoveTree(numLayers int, board *Board, token byte) (*graph.Graph, *grap
         newNodeList := make([]graph.Node, 0, len(*nodeList) * NumCols)
         for _, node := range *nodeList {
             nodeBoard := buildBoardFromMoveList((*node.Value).([]int), board)
-            buildMoveTreeLayer(nodeBoard, g, &node)
-            newNodeList = append(newNodeList, g.Neighbors(node)...)
+            
+            // Don't keep building out tree if the game is over
+            if (!nodeBoard.CheckEndGame()) {
+                buildMoveTreeLayer(nodeBoard, g, &node)
+                newNodeList = append(newNodeList, g.Neighbors(node)...)
+            }
         }
         nodeList = &newNodeList
     }

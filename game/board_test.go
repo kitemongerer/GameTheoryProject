@@ -267,6 +267,7 @@ func TestCheckSectionValueBothTokens(t *testing.T) {
 	  expected int // expected result
 	}{
 	  {"     XO", ConfigValues["T "]},
+	  {"   XO  ", 0},
 	  {"   XOX ", 2 * ConfigValues["T "]},
 	  {" XXOOX ", ConfigValues["T "] + ConfigValues["TT "]},
 	}
