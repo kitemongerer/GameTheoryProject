@@ -13,12 +13,12 @@ var ConfigValues = map[string]int{
     "T "	:	1,
     " T"	:	1,
     " T "	:	2,
-    "TT "	:	3,
-    " TT"	:	3,
-    " TT "	:	4,
+    "TT "	:	2,
+    " TT"	:	2,
+    " TT "	:	5,
     "TTT "	:	5,
     " TTT"	:	5,
-    " TTT "	:	100,
+    " TTT "	:	10,
     
     // Maximum integer value since it is a win
     "TTTT"	:	int(^uint(0)  >> 1),

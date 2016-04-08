@@ -171,4 +171,27 @@ func TestBuildBoardFromMoveList(t *testing.T) {
 	}
 }
 
+func TestSmartMakeMove(t *testing.T) {
+	board := NewBoard()
+
+	board.board[0] = [6]byte{'X', 'X', ' ', ' ', ' ', ' '}
+	board.board[1] = [6]byte{'X', 'X', 'O', 'O', ' ', ' '}
+	board.board[2] = [6]byte{'X', 'O', 'X', 'X', ' ', ' '}
+	board.board[3] = [6]byte{'O', 'X', 'O', 'O', 'O', 'X'}
+	board.board[4] = [6]byte{'X', 'O', 'O', 'X', 'O', 'O'}
+	board.board[5] = [6]byte{'X', 'X', 'O', 'X', 'O', ' '}
+	board.board[6] = [6]byte{' ', ' ', ' ', ' ', ' ', ' '}
+
+	board.WhoseTurn = 1
+	//board.Print()
+	var p2 = NewSmartPlayer(1, 4)
+	move := p2.MakeMove(board)
+
+	//board.Print()
+	if move != 2 {
+		t.Error("Should have made move to win game.")
+	}
+}
+
+
 

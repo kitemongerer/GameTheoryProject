@@ -86,7 +86,7 @@ func executeHumanGame() {
 	var b = game.NewBoard()
 
 	var p1 game.HumanPlayer
-	var p2 = game.NewSmartPlayer(1, 2)
+	var p2 = game.NewSmartPlayer(1, 4)
 
 	for !b.CheckEndGame() {
 		p1.MakeMove(b)
@@ -95,11 +95,6 @@ func executeHumanGame() {
 		duration := time.Second
   		time.Sleep(duration)
 
-  		// Clear terminal
-		cmd := exec.Command("clear") //Linux example, its tested
-        cmd.Stdout = os.Stdout
-        cmd.Run()
-
 		// If p1 didn't win, p2 gets to move
 		if (!b.CheckEndGame()) {
 			p2.MakeMove(b)
@@ -107,6 +102,10 @@ func executeHumanGame() {
 
 		b.Print()
 
+		// Clear terminal
+		cmd := exec.Command("clear") //Linux example, its tested
+        cmd.Stdout = os.Stdout
+        cmd.Run()
 		
 	}
 

@@ -65,20 +65,20 @@ func NewSmartPlayer(playerIdx int, numLayers int) *SmartPlayer {
 func (player *SmartPlayer) MakeMove(board *Board) int {
     g, startNode, _ := buildMoveTree(player.NumLayers, board, player.Piece)
 
-    _, arr := backwardsInduct(g, startNode, player.Piece, board)
+    _, arr := backwardsInduct(g, startNode, player.Piece, board, .95)
 
     board.MakeMove(arr[0])
     return arr[0]
 }
 
-func backwardsInduct(g *graph.Graph, startNode *graph.Node, token byte, originalBoard *Board) (int, []int) {
+func backwardsInduct(g *graph.Graph, startNode *graph.Node, token byte, originalBoard *Board, decay float64) (int, []int) {
     if len(g.Neighbors(*startNode)) > 0 {
         // most negative value
         value := -int(^uint(0)  >> 1)
         idx := 0
         //fmt.Printf("Token: %c ", token)
         for i, node := range g.Neighbors(*startNode) {
-            tmpVal, _ := backwardsInduct(g, &node, nextToken(token), originalBoard)
+            tmpVal, _ := backwardsInduct(g, &node, nextToken(token), originalBoard, decay * decay)
           //  fmt.Printf("%d, ", tmpVal)
             if tmpVal > value {
                 value = tmpVal
@@ -97,12 +97,12 @@ func backwardsInduct(g *graph.Graph, startNode *graph.Node, token byte, original
             }
         }
         //fmt.Printf("\n")
-
+  
         chosenMoveList := (*g.Neighbors(*startNode)[idx].Value).([]int)
         return -value, chosenMoveList
     } else {
         val := buildBoardFromMoveList((*startNode.Value).([]int), originalBoard).CalcPlayerValue(nextToken(token))
-        return val, (*startNode.Value).([]int)
+        return int(float64(val) * decay), (*startNode.Value).([]int)
     }
 }
 
