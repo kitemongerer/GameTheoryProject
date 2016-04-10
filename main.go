@@ -1,7 +1,8 @@
 package main
 
 import (
-	"FinalProject/game"
+	"github.com/kitemongerer/GameTheoryProject/game"
+
 	"os"
     "os/exec"
     "fmt"
