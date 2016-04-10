@@ -11,6 +11,8 @@ import (
     "strings"
 )
 
+var Decay = .95
+
 type Player interface {
 	MakeMove(board *Board) int
 }
@@ -45,6 +47,10 @@ func (player *HumanPlayer) MakeMove(board *Board) int {
     fmt.Print("Enter column (1-7): ")
     text, _ := reader.ReadString('\n')
     move, _ := strconv.Atoi(strings.TrimSpace(text))
+
+    if (move < 1 || move > 7 || !board.IsValidMove(move - 1)) {
+        return player.MakeMove(board)
+    }
     //fmt.Println(move)
 
     // User move will be 1-indexed. We want 0 indexed
@@ -65,7 +71,7 @@ func NewSmartPlayer(playerIdx int, numLayers int) *SmartPlayer {
 func (player *SmartPlayer) MakeMove(board *Board) int {
     g, startNode, _ := buildMoveTree(player.NumLayers, board, player.Piece)
 
-    _, arr := backwardsInduct(g, startNode, player.Piece, board, .95)
+    _, arr := backwardsInduct(g, startNode, player.Piece, board, Decay)
 
     board.MakeMove(arr[0])
     return arr[0]

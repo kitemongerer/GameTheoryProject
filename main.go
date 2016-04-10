@@ -86,7 +86,7 @@ func executeHumanGame() {
 	var b = game.NewBoard()
 
 	var p1 game.HumanPlayer
-	var p2 = game.NewSmartPlayer(1, 4)
+	var p2 = game.NewSmartPlayer(1, 5)
 
 	for !b.CheckEndGame() {
 		p1.MakeMove(b)
