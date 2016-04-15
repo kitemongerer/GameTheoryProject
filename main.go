@@ -65,18 +65,15 @@ func executeGame(idx int, victorySlice *[]byte, wg *sync.WaitGroup) {
 	// Switch off who goes first
 	b.WhoseTurn = idx % 2
 
-	var p1 = game.NewSmartPlayer(0, 3)
+	var p1 = game.NewSmartPlayer(0, 1)
 	var p2 = game.NewSmartPlayer(1, 1)
 
 	for !b.CheckEndGame() {
-		p1.MakeMove(b)
-		//b.Print()
-		// If p1 didn't win, p2 gets to move
-		if (!b.CheckEndGame()) {
+		if b.WhoseTurn == 0 {
+			p1.MakeMove(b)
+		} else {
 			p2.MakeMove(b)
 		}
-		//b.Print()
-		//fmt.Println(b.CalcPlayerValue('O'))
 	}
 
 	(*victorySlice)[idx] = b.Winner
